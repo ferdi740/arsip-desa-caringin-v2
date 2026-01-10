@@ -1,0 +1,240 @@
+@extends('layouts.app')
+
+@section('title', 'Tambah User Baru')
+
+@section('content')
+<div class="min-h-screen bg-off-white py-4 sm:py-6">
+    <div class="container mx-auto px-3 sm:px-4">
+        <!-- Header Section -->
+        <div class="mb-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                <div class="w-full">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-navy-blue mb-1">Tambah Pengguna Baru</h1>
+                    <p class="text-sm sm:text-base text-steel-blue/80 font-medium">Buat akun baru untuk akses sistem arsip</p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <a href="{{ route('admin.users.index') }}" 
+                       class="w-full md:w-auto inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 bg-white text-navy-blue font-semibold rounded-xl shadow-sm border border-soft-gray hover:bg-off-white transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-navy-blue/50">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        <span class="text-sm sm:text-base">Kembali</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success & Error Alerts -->
+        @if(session('success'))
+        <div class="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 rounded-r-lg p-4 shadow-sm" role="alert">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p class="text-sm sm:text-base text-green-700 font-medium">{{ session('success') }}</p>
+            </div>
+        </div>
+        @endif
+
+        @if($errors->any())
+        <div class="mb-6 bg-gradient-to-r from-red-50 to-rose-50 border-l-4 border-red-500 rounded-r-lg p-4 shadow-sm" role="alert">
+            <div class="flex flex-col">
+                <div class="flex items-center mb-2">
+                    <svg class="w-5 h-5 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <p class="text-sm sm:text-base text-red-700 font-medium">Terjadi kesalahan!</p>
+                </div>
+                <ul class="list-disc list-inside ml-8 text-sm text-red-600">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+        @endif
+
+        <!-- Form Card -->
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-soft-gray overflow-hidden">
+                <!-- Card Header -->
+                <div class="px-4 sm:px-6 py-4 sm:py-5 bg-navy-blue">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                        <h3 class="text-lg sm:text-xl font-semibold text-white">Form Tambah Pengguna</h3>
+                    </div>
+                </div>
+
+                <!-- Form Content -->
+                <div class="p-4 sm:p-6">
+                    <form action="{{ route('admin.users.store') }}" method="POST">
+                        @csrf
+                        
+                        <!-- Nama Lengkap -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold text-navy-blue mb-2">
+                                Nama Lengkap
+                                <span class="text-red-500 ml-1">*</span>
+                            </label>
+                            <input type="text" 
+                                   name="nama_lengkap" 
+                                   value="{{ old('nama_lengkap') }}"
+                                   class="w-full px-4 py-3 rounded-xl border border-soft-gray bg-white text-charcoal placeholder-charcoal/40 focus:outline-none focus:ring-2 focus:ring-navy-blue/30 focus:border-navy-blue/50 transition-all duration-200"
+                                   placeholder="Masukkan nama lengkap pengguna"
+                                   required>
+                            <p class="text-xs text-steel-blue/60 mt-1">Nama lengkap sesuai dengan identitas resmi</p>
+                        </div>
+
+                        <!-- Username & Password Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-navy-blue mb-2">
+                                    Username
+                                    <span class="text-red-500 ml-1">*</span>
+                                </label>
+                                <input type="text" 
+                                       name="username" 
+                                       value="{{ old('username') }}"
+                                       class="w-full px-4 py-3 rounded-xl border border-soft-gray bg-white text-charcoal placeholder-charcoal/40 focus:outline-none focus:ring-2 focus:ring-navy-blue/30 focus:border-navy-blue/50 transition-all duration-200"
+                                       placeholder="contoh: johndoe"
+                                       required>
+                                <p class="text-xs text-steel-blue/60 mt-1">Untuk login ke sistem</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-navy-blue mb-2">
+                                    Password
+                                    <span class="text-red-500 ml-1">*</span>
+                                </label>
+                                <input type="password" 
+                                       name="password" 
+                                       class="w-full px-4 py-3 rounded-xl border border-soft-gray bg-white text-charcoal placeholder-charcoal/40 focus:outline-none focus:ring-2 focus:ring-navy-blue/30 focus:border-navy-blue/50 transition-all duration-200"
+                                       placeholder="Minimal 6 karakter"
+                                       required>
+                                <p class="text-xs text-steel-blue/60 mt-1">Gunakan kombinasi yang kuat</p>
+                            </div>
+                        </div>
+
+                        <!-- Role Selection -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold text-navy-blue mb-2">
+                                Peran (Role)
+                                <span class="text-red-500 ml-1">*</span>
+                            </label>
+                            <div class="relative">
+                                <select name="id_role" 
+                                        class="w-full px-4 py-3 rounded-xl border border-soft-gray bg-white text-charcoal appearance-none focus:outline-none focus:ring-2 focus:ring-navy-blue/30 focus:border-navy-blue/50 transition-all duration-200 cursor-pointer">
+                                    @foreach($roles as $role)
+                                        <option value="{{ $role->id }}" {{ old('id_role') == $role->id ? 'selected' : '' }}>
+                                            {{ $role->nama_peran }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-navy-blue">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <p class="text-xs text-steel-blue/60 mt-1">Tentukan hak akses pengguna</p>
+                        </div>
+
+                        <!-- Unit Kerja Selection -->
+                        <div class="mb-8">
+                            <label class="block text-sm font-semibold text-navy-blue mb-2">
+                                Unit Kerja
+                                <span class="text-steel-blue/60 font-normal text-xs ml-1">(Opsional untuk Admin)</span>
+                            </label>
+                            <div class="relative">
+                                <select name="id_unit_kerja" 
+                                        class="w-full px-4 py-3 rounded-xl border border-soft-gray bg-white text-charcoal appearance-none focus:outline-none focus:ring-2 focus:ring-navy-blue/30 focus:border-navy-blue/50 transition-all duration-200 cursor-pointer">
+                                    <option value="">-- Pilih Unit Kerja --</option>
+                                    @foreach($unitKerja as $unit)
+                                        <option value="{{ $unit->id }}" {{ old('id_unit_kerja') == $unit->id ? 'selected' : '' }}>
+                                            {{ $unit->nama_unit }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-navy-blue">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <p class="text-xs text-steel-blue/60 mt-1">Kosongkan jika role adalah Admin</p>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-soft-gray">
+                            <a href="{{ route('admin.users.index') }}" 
+                               class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 bg-white text-navy-blue font-semibold rounded-xl shadow-sm border border-soft-gray hover:bg-off-white transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-navy-blue/30">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                                Batal
+                            </a>
+                            <button type="submit" 
+                                    class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 bg-navy-blue text-white font-semibold rounded-xl shadow-lg hover:bg-steel-blue transition-all duration-200 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-navy-blue/50">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Simpan Pengguna
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Form Footer -->
+                <div class="px-4 sm:px-6 py-3 sm:py-4 border-t border-soft-gray bg-off-white">
+                    <div class="text-xs text-steel-blue/60">
+                        <span class="font-semibold text-navy-blue/80">Catatan:</span> Pastikan data yang diisi sudah benar. Pengguna dapat login setelah akun dibuat.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom Colors - Same as reference */
+    :root {
+        --navy-blue: #0A2540;
+        --steel-blue: #334E68;
+        --off-white: #F8F9FB;
+        --white: #FFFFFF;
+        --charcoal: #111827;
+        --soft-gray: #E5E7EB;
+    }
+
+    .bg-navy-blue { 
+        background-color: #0A2540 !important; 
+    }
+    .text-navy-blue { 
+        color: #0A2540 !important; 
+    }
+    .bg-steel-blue { background-color: var(--steel-blue); }
+    .text-steel-blue { color: var(--steel-blue); }
+    .bg-off-white { background-color: var(--off-white); }
+    .text-charcoal { color: var(--charcoal); }
+    .border-soft-gray { border-color: var(--soft-gray); }
+    .placeholder-charcoal\/40::placeholder { 
+        color: rgba(17, 24, 39, 0.4); 
+    }
+    
+    /* Focus rings */
+    .focus\:ring-navy-blue\/30:focus {
+        --tw-ring-color: rgba(10, 37, 64, 0.3) !important;
+    }
+    
+    .focus\:ring-navy-blue\/50:focus {
+        --tw-ring-color: rgba(10, 37, 64, 0.5) !important;
+    }
+    
+    /* Gradient */
+    .bg-gradient-to-r {
+        background-image: linear-gradient(to right, var(--tw-gradient-stops));
+    }
+</style>
+@endsection
