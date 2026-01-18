@@ -4,22 +4,19 @@
 
 @section('content')
 <div class="min-h-screen bg-off-white">
-    <!-- Header Dashboard -->
     <div class="bg-navy-blue text-white">
         <div class="container mx-auto px-4 py-8">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 class="text-3xl md:text-4xl font-bold mb-2">Dashboard Ikhtisar</h1>
-                    <p class="text-steel-blue-light">Selamat datang, {{ Auth::user()->name }}! Berikut ringkasan aktivitas sistem arsip.</p>
+                    <p class="text-steel-blue-light">Selamat datang, {{ Auth::user()->nama_lengkap }}! Berikut ringkasan aktivitas sistem arsip.</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Stats Cards -->
     <div class="container mx-auto px-4 -mt-6 mb-8">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Total Dokumen Card -->
             <div class="bg-white rounded-xl shadow-lg p-6 border border-soft-gray hover:shadow-xl transition-shadow duration-300">
                 <div class="flex items-center justify-between mb-4">
                     <div class="p-3 rounded-lg bg-navy-blue/10">
@@ -34,7 +31,6 @@
                 <div class="h-1 bg-gradient-to-r from-navy-blue to-steel-blue rounded-full"></div>
             </div>
 
-            <!-- Dokumen Bulan Ini Card -->
             <div class="bg-white rounded-xl shadow-lg p-6 border border-soft-gray hover:shadow-xl transition-shadow duration-300">
                 <div class="flex items-center justify-between mb-4">
                     <div class="p-3 rounded-lg bg-blue-50">
@@ -49,7 +45,6 @@
                 <div class="h-1 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"></div>
             </div>
 
-            <!-- Jenis Kategori Card -->
             <div class="bg-white rounded-xl shadow-lg p-6 border border-soft-gray hover:shadow-xl transition-shadow duration-300">
                 <div class="flex items-center justify-between mb-4">
                     <div class="p-3 rounded-lg bg-purple-50">
@@ -64,7 +59,6 @@
                 <div class="h-1 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full"></div>
             </div>
 
-            <!-- Status Akun Card -->
             <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 {{ Auth::user()->role->nama_peran == 'Admin' ? 'border-soft-gold' : 'border-green-500' }} hover:shadow-xl transition-shadow duration-300">
                 <div class="flex items-center justify-between mb-4">
                     <div class="p-3 rounded-lg {{ Auth::user()->role->nama_peran == 'Admin' ? 'bg-soft-gold/20' : 'bg-green-50' }}">
@@ -81,10 +75,8 @@
         </div>
     </div>
 
-    <!-- Charts & Table Section -->
     <div class="container mx-auto px-4 mb-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Statistik Arsip per Kategori -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-soft-gray">
                 <div class="px-6 py-4 border-b border-soft-gray bg-navy-blue">
                     <div class="flex items-center justify-between">
@@ -100,7 +92,9 @@
                             <canvas id="chartDokumen"></canvas>
                         </div>
                         <div class="mt-4 pt-4 border-t border-soft-gray">
-                            <p class="text-sm text-charcoal/70 text-center">Total dokumen terdistribusi ke {{ $totalKategori }} kategori</p>
+                            <p class="text-sm text-charcoal/70 text-center">
+    Total dokumen terdistribusi ke <strong>{{ $kategoriTerpakai }}</strong> kategori
+</p>
                         </div>
                     @else
                         <div class="flex flex-col items-center justify-center h-64 bg-off-white rounded-lg border border-dashed border-soft-gray">
@@ -113,7 +107,6 @@
                 </div>
             </div>
 
-            <!-- Dokumen Terbaru -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-soft-gray">
                 <div class="px-6 py-4 border-b border-soft-gray bg-navy-blue">
                     <div class="flex items-center justify-between">
@@ -279,7 +272,6 @@
     </script>
 @endif
 
-<!-- Script untuk format tanggal di mobile -->
 <script>
     // Format tanggal untuk input type="date" di mobile
     document.addEventListener('DOMContentLoaded', function() {

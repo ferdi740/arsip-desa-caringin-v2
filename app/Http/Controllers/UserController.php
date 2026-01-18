@@ -7,13 +7,14 @@ use App\Models\Role;
 use App\Models\UnitKerja;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth; // <-- PERBAIKAN 1: Tambahkan ini
+use Illuminate\Support\Facades\Storage; // <--- JANGAN LUPA INI
 
 class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with(['role', 'unitKerja'])->latest()->get();
+        // Eager load relasi unitKerja dan role agar query ringan
+        $users = User::with(['unitKerja', 'role'])->latest()->get();
         return view('admin.users.index', compact('users'));
     }
 
@@ -27,25 +28,31 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_lengkap' => 'required|string|max:150',
-            'username'     => 'required|string|max:50|unique:users,username',
-            'email'        => 'nullable|email|unique:users,email',
+            'nama_lengkap' => 'required|string|max:255',
+            'username'     => 'required|string|max:50|unique:users',
             'password'     => 'required|string|min:6',
             'id_role'      => 'required|exists:role,id',
             'id_unit_kerja'=> 'nullable|exists:unit_kerja,id',
+            'status_aktif' => 'boolean',
+            // Validasi Foto
+            'foto_profil'  => 'nullable|image|mimes:jpeg,png,jpg|max:2048', 
         ]);
 
-        User::create([
-            'nama_lengkap' => $request->nama_lengkap,
-            'username'     => $request->username,
-            'email'        => $request->email,
-            'password'     => Hash::make($request->password),
-            'id_role'      => $request->id_role,
-            'id_unit_kerja'=> $request->id_unit_kerja, // Bisa null jika Admin
-            'status_aktif' => 1
-        ]);
+        $data = $request->except(['password', 'foto_profil']);
+        $data['password'] = Hash::make($request->password);
+        // Default status aktif jika tidak dicentang (null) dianggap false, kita paksa true/false
+        $data['status_aktif'] = $request->has('status_aktif'); 
 
-        return redirect()->route('admin.users.index')->with('success', 'Pengguna baru berhasil ditambahkan.');
+        // LOGIKA UPLOAD FOTO
+        if ($request->hasFile('foto_profil')) {
+            // Simpan ke folder 'public/foto_profil'
+            $path = $request->file('foto_profil')->store('foto_profil', 'public');
+            $data['foto_profil'] = $path;
+        }
+
+        User::create($data);
+
+        return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil ditambahkan.');
     }
 
     public function edit($id)
@@ -61,24 +68,33 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $request->validate([
-            'nama_lengkap' => 'required|string|max:150',
+            'nama_lengkap' => 'required|string|max:255',
+            // Username unique kecuali punya diri sendiri
             'username'     => 'required|string|max:50|unique:users,username,'.$id,
+            'password'     => 'nullable|string|min:6',
             'id_role'      => 'required|exists:role,id',
-            'password'     => 'nullable|string|min:6', // Password opsional saat edit
+            'id_unit_kerja'=> 'nullable|exists:unit_kerja,id',
+            'foto_profil'  => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $data = [
-            'nama_lengkap' => $request->nama_lengkap,
-            'username'     => $request->username,
-            'email'        => $request->email,
-            'id_role'      => $request->id_role,
-            'id_unit_kerja'=> $request->id_unit_kerja,
-            'status_aktif' => $request->has('status_aktif') ? 1 : 0
-        ];
-
-        // Hanya update password jika diisi
+        $data = $request->except(['password', 'foto_profil']);
+        
+        // Update password hanya jika diisi
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
+        }
+
+        $data['status_aktif'] = $request->has('status_aktif');
+
+        // LOGIKA UPDATE FOTO
+        if ($request->hasFile('foto_profil')) {
+            // 1. Hapus foto lama jika ada
+            if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
+                Storage::disk('public')->delete($user->foto_profil);
+            }
+            // 2. Upload foto baru
+            $path = $request->file('foto_profil')->store('foto_profil', 'public');
+            $data['foto_profil'] = $path;
         }
 
         $user->update($data);
@@ -90,12 +106,12 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         
-        // PERBAIKAN 2: Menggunakan Facade Auth::id() agar dikenali editor
-        if (Auth::id() == $id) {
-            return back()->withErrors(['Tidak bisa menghapus akun sendiri!']);
+        // Hapus foto profil dari storage jika ada
+        if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
+            Storage::disk('public')->delete($user->foto_profil);
         }
 
         $user->delete();
-        return back()->with('success', 'Pengguna berhasil dihapus.');
+        return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil dihapus.');
     }
 }

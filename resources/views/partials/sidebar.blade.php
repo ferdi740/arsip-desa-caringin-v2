@@ -1,7 +1,6 @@
 <div :class="sidebarOpen ? 'translate-x-0 ease-out' : '-translate-x-full ease-in'" 
-     class="fixed z-30 inset-y-0 left-0 w-64 transition duration-300 transform bg-navy-blue overflow-y-auto lg:translate-x-0 lg:static lg:inset-0">
+     class="fixed z-[60] inset-y-0 left-0 w-64 transition duration-300 transform bg-navy-blue overflow-y-auto lg:translate-x-0 lg:static lg:inset-0">
     
-    <!-- Logo Section -->
     <div class="px-6 py-8">
         <div class="flex items-center space-x-3">
             <div class="relative">
@@ -19,9 +18,7 @@
         </div>
     </div>
 
-    <!-- Navigation Menu -->
     <nav class="px-4 space-y-1">
-        <!-- Menu Utama Section -->
         <div class="mb-6">
             <div class="px-3 mb-3">
                 <p class="text-xs font-semibold text-steel-blue-light uppercase tracking-wider">Menu Utama</p>
@@ -29,7 +26,6 @@
             </div>
             
             <div class="space-y-1">
-                <!-- Dashboard -->
                 <a class="flex items-center px-3 py-3 rounded-lg transition-all duration-200 {{ request()->routeIs('dashboard') ? 'bg-white/10 text-white border-l-4 border-soft-gold' : 'text-steel-blue-light hover:bg-white/5 hover:text-white' }}" 
                    href="{{ route('dashboard') }}">
                     <div class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('dashboard') ? 'bg-soft-gold/20' : 'bg-white/5' }}">
@@ -44,7 +40,6 @@
                     @endif
                 </a>
 
-                <!-- Arsip Dokumen -->
                 <a class="flex items-center px-3 py-3 rounded-lg transition-all duration-200 {{ request()->routeIs('dokumen.*') ? 'bg-white/10 text-white border-l-4 border-soft-gold' : 'text-steel-blue-light hover:bg-white/5 hover:text-white' }}" 
                    href="{{ route('dokumen.index') }}">
                     <div class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('dokumen.*') ? 'bg-soft-gold/20' : 'bg-white/5' }}">
@@ -59,7 +54,6 @@
                     @endif
                 </a>
                 
-                <!-- Laporan -->
                 <a class="flex items-center px-3 py-3 rounded-lg transition-all duration-200 {{ request()->routeIs('laporan.*') ? 'bg-white/10 text-white border-l-4 border-soft-gold' : 'text-steel-blue-light hover:bg-white/5 hover:text-white' }}" 
                    href="{{ route('laporan.index') }}">
                     <div class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('laporan.*') ? 'bg-soft-gold/20' : 'bg-white/5' }}">
@@ -76,7 +70,6 @@
             </div>
         </div>
 
-        <!-- Administrator Section (Only for Admin Users) -->
         @if(Auth::user()->role->nama_peran == 'Admin')
             <div class="mb-6">
                 <div class="px-3 mb-3">
@@ -87,7 +80,6 @@
                 </div>
 
                 <div class="space-y-1">
-                    <!-- Kategori -->
                     <a class="flex items-center px-3 py-3 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.kategori.*') ? 'bg-white/10 text-white border-l-4 border-soft-gold' : 'text-steel-blue-light hover:bg-white/5 hover:text-white' }}" 
                        href="{{ route('admin.kategori.index') }}">
                         <div class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('admin.kategori.*') ? 'bg-soft-gold/20' : 'bg-white/5' }}">
@@ -102,7 +94,6 @@
                         @endif
                     </a>
 
-                    <!-- Pengguna -->
                     <a class="flex items-center px-3 py-3 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.users.*') ? 'bg-white/10 text-white border-l-4 border-soft-gold' : 'text-steel-blue-light hover:bg-white/5 hover:text-white' }}" 
                        href="{{ route('admin.users.index') }}">
                         <div class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-soft-gold/20' : 'bg-white/5' }}">
@@ -117,7 +108,6 @@
                         @endif
                     </a>
 
-                    <!-- Log Aktivitas -->
                     <a class="flex items-center px-3 py-3 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.logs.*') ? 'bg-white/10 text-white border-l-4 border-soft-gold' : 'text-steel-blue-light hover:bg-white/5 hover:text-white' }}" 
                        href="{{ route('admin.logs.index') }}">
                         <div class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('admin.logs.*') ? 'bg-soft-gold/20' : 'bg-white/5' }}">
@@ -132,7 +122,6 @@
                         @endif
                     </a>
 
-                    <!-- Backup & Restore -->
                     <a class="flex items-center px-3 py-3 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.backup.*') ? 'bg-white/10 text-white border-l-4 border-soft-gold' : 'text-steel-blue-light hover:bg-white/5 hover:text-white' }}" 
                        href="{{ route('admin.backup.index') }}">
                         <div class="w-8 h-8 flex items-center justify-center rounded-lg {{ request()->routeIs('admin.backup.*') ? 'bg-soft-gold/20' : 'bg-white/5' }}">
@@ -151,10 +140,9 @@
         @endif
     </nav>
 
-    <!-- Logout Button (Fixed at Bottom) -->
     <div class="sticky bottom-0 left-0 right-0 bg-navy-blue border-t border-navy-blue-light/50 mt-8">
         <div class="p-4">
-            <form method="POST" action="{{ route('logout') }}">
+            <form id="logout-form" method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" 
                         class="flex items-center w-full px-3 py-3 rounded-lg text-steel-blue-light hover:bg-red-500/10 hover:text-red-200 transition-all duration-200 group">

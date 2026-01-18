@@ -1,8 +1,6 @@
 <header class="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-white border-b border-soft-gray shadow-sm">
     
-    <!-- Left Section: Menu Toggle & Brand -->
     <div class="flex items-center space-x-4">
-        <!-- Mobile Menu Toggle -->
         <button @click="sidebarOpen = true" 
                 class="lg:hidden p-2.5 rounded-lg text-charcoal/70 hover:text-navy-blue hover:bg-off-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-soft-gold/30">
             <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -10,7 +8,6 @@
             </svg>
         </button>
         
-        <!-- Brand -->
         <div class="flex items-center">
             <div class="hidden sm:flex items-center space-x-3">
                 <div class="flex flex-col">
@@ -18,7 +15,6 @@
                 </div>
             </div>
             
-            <!-- Mobile Brand -->
             <div class="sm:hidden flex items-center space-x-2">
                 <div class="w-8 h-8 rounded-lg bg-linear-to-br from-navy-blue to-steel-blue flex items-center justify-center shadow-sm">
                     <svg class="w-5 h-5 text-soft-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -30,9 +26,7 @@
         </div>
     </div>
     
-    <!-- Right Section: Actions & User -->
     <div class="flex items-center space-x-4">
-        <!-- Notifications -->
         <div class="relative" x-data="{ notifOpen: false }">
             <button @click="notifOpen = !notifOpen" 
                     class="relative p-2.5 rounded-lg transition-all duration-200 hover:bg-off-white group focus:outline-none focus:ring-2 focus:ring-soft-gold/30">
@@ -44,14 +38,13 @@
                     </svg>
                     
                     @if($notifCount > 0)
-                    <span class="absolute -top-1.5 -right-1.5 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-linear-to-r from-red-500 to-red-600 rounded-full border-2 border-white shadow-sm">
+                    <span class="absolute -top-1.5 -right-1.5 inline-flex items-center justify-center min-w-5 h-5 px-1.5 text-xs font-bold text-white bg-linear-to-r from-red-500 to-red-600 rounded-full border-2 border-white shadow-sm">
                         {{ $notifCount > 9 ? '9+' : $notifCount }}
                     </span>
                     @endif
                 </div>
             </button>
 
-            <!-- Notifications Dropdown -->
             <div x-show="notifOpen" 
                  @click.away="notifOpen = false" 
                  x-transition:enter="transition ease-out duration-100"
@@ -63,7 +56,6 @@
                  class="absolute right-0 mt-2 w-80 md:w-96 bg-white rounded-xl shadow-lg overflow-hidden z-50 border border-soft-gray"
                  style="display: none;">
                 
-                <!-- Dropdown Header -->
                 <div class="px-4 py-3 bg-linear-to-r from-navy-blue to-steel-blue">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
@@ -81,25 +73,26 @@
                     </div>
                 </div>
                 
-                <!-- Notifications List -->
                 <div class="max-h-80 overflow-y-auto">
                     @forelse($notifList as $notif)
                         @php
-                            // Tentukan link berdasarkan data notifikasi
-                            // Model Anda menggunakan link_target, bukan id_dokumen
-                            $link = $notif->link_target ?? '#';
-                            
-                            // Jika tidak ada link_target, coba buat dari id_dokumen (jika ada)
-                            if ($link === '#' && isset($notif->id_dokumen) && $notif->id_dokumen) {
+                            $link = '#';
+                            if (isset($notif->id_dokumen) && $notif->id_dokumen) {
                                 $link = route('dokumen.show', $notif->id_dokumen);
+                            } elseif (!empty($notif->link_target)) {
+                                $link = $notif->link_target;
                             }
                         @endphp
                         
-                        <a href="{{ $link }}" 
-                           onclick="if(event) { event.preventDefault(); } markNotificationAsRead({{ $notif->id }}, '{{ addslashes($link) }}');"
-                           class="block px-4 py-3 border-b border-soft-gray hover:bg-off-white transition-colors duration-150 group cursor-pointer">
+                        <a href="{{ $link }}"
+   data-id="{{ $notif->id }}"
+   data-link="{{ $link }}"
+   onclick="markNotificationAsRead(event, this.dataset.id, this.dataset.link)"
+   class="block px-4 py-3 border-b border-soft-gray hover:bg-off-white transition-colors duration-150 group cursor-pointer">
+
+
                             <div class="flex items-start space-x-3">
-                                <div class="flex-shrink-0 mt-0.5">
+                                <div class="shrink-0 mt-0.5">
                                     <div class="w-2 h-2 rounded-full {{ $notif->sudah_dibaca ? 'bg-gray-300' : 'bg-blue-500 animate-pulse' }}"></div>
                                 </div>
                                 <div class="flex-1 min-w-0">
@@ -135,7 +128,6 @@
                     @endforelse
                 </div>
                 
-                <!-- Dropdown Footer -->
                 @if($notifList->count() > 0)
                 <div class="px-4 py-3 bg-off-white border-t border-soft-gray">
                     <div class="text-center">
@@ -154,10 +146,8 @@
             </div>
         </div>
 
-        <!-- Separator -->
         <div class="h-8 w-px bg-soft-gray mx-1 hidden md:block"></div>
 
-        <!-- User Profile -->
         <div class="flex items-center space-x-3 pl-1">
             <div class="hidden md:flex flex-col items-end">
                 <span class="text-sm font-bold text-navy-blue leading-tight max-w-[140px] truncate">
@@ -167,18 +157,23 @@
                     {{ Auth::user()->role->nama_peran }}
                 </span>
             </div>
-            
-            <!-- User Avatar -->
+
             <div class="relative">
-                <div class="w-10 h-10 rounded-xl bg-linear-to-br from-navy-blue to-steel-blue shadow flex items-center justify-center text-white font-bold text-lg select-none overflow-hidden hover:shadow-md transition-all duration-200">
-                    {{ strtoupper(substr(Auth::user()->nama_lengkap, 0, 1)) }}
+                <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white" style="z-index: 10000;"></div>
+                <div class="w-10 h-10 rounded-3xl bg-linear-to-br from-navy-blue to-steel-blue shadow flex items-center justify-center text-white font-bold text-lg select-none overflow-hidden hover:shadow-md transition-all duration-200">
                     
-                    <!-- Status Indicator -->
-                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
+                    @if(Auth::user()->foto_profil)
+                        <img src="{{ asset('storage/' . Auth::user()->foto_profil) }}" 
+                             alt="{{ Auth::user()->nama_lengkap }}" 
+                             class="w-full h-full object-cover">
+                    @else
+                        {{ strtoupper(substr(Auth::user()->nama_lengkap, 0, 1)) }}
+                    @endif
                     
-                    <!-- Gold accent for Admin -->
+                    
+                    
                     @if(Auth::user()->role->nama_peran == 'Admin')
-                        <div class="absolute inset-0 rounded-xl border border-soft-gold/40"></div>
+                        <div class="absolute inset-0 rounded-3xl border border-soft-gold/40 pointer-events-none"></div>
                     @endif
                 </div>
             </div>
@@ -187,11 +182,13 @@
 </header>
 
 <script>
-    // Fungsi untuk menandai notifikasi sebagai dibaca
-    function markNotificationAsRead(notificationId, redirectUrl) {
-        // Kirim request untuk menandai sebagai dibaca
+    // FIXED: Fungsi sekarang menerima 'event' sebagai parameter pertama
+    function markNotificationAsRead(event, notificationId, redirectUrl) {
+        // Cegah link membuka halaman secara default sebelum JS selesai
+        if (event) event.preventDefault();
+
         fetch(`/notifikasi/baca/${notificationId}`, {
-            method: 'GET', // Route Anda adalah GET, bukan POST
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -199,8 +196,8 @@
         })
         .then(response => {
             if (response.ok || response.redirected) {
-                // Jika response OK atau redirect, lanjutkan ke redirectUrl
-                if (redirectUrl !== '#' && redirectUrl !== '') {
+                // Redirect manual via JS setelah status dibaca terupdate
+                if (redirectUrl && redirectUrl !== '#' && redirectUrl !== '') {
                     window.location.href = redirectUrl;
                 } else {
                     location.reload();
@@ -211,8 +208,8 @@
         })
         .catch(error => {
             console.error('Error:', error);
-            // Tetap redirect meski ada error
-            if (redirectUrl !== '#' && redirectUrl !== '') {
+            // Tetap redirect meski ada error (fallback)
+            if (redirectUrl && redirectUrl !== '#' && redirectUrl !== '') {
                 window.location.href = redirectUrl;
             } else {
                 location.reload();
@@ -220,10 +217,8 @@
         });
     }
 
-    // Fungsi untuk menandai semua notifikasi sebagai dibaca
     function markAllAsRead() {
         // Arahkan langsung ke route karena sudah ada di href
-        // Function ini hanya untuk backup jika onclick tidak berfungsi
     }
 </script>
 
@@ -257,6 +252,8 @@
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
+        /* FIXED: Menambahkan properti standar agar warning CSS hilang */
+        line-clamp: 2; 
     }
     
     /* Gradient */
